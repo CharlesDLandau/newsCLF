@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+Design by TEMPLATED
+http://templated.co
+Released for free under the Creative Commons Attribution License
+
+Name       : Skeleton 
+Description: A two-column, fixed-width design with dark color scheme.
+Version    : 1.0
+Released   : 20130902
+
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900" rel="stylesheet" />
+<link href="{{ url_for('static', filename='css/default.css')}}" rel="stylesheet" type="text/css" media="all" />
+<link href="{{ url_for('static', filename='css/fonts.css')}}" rel="stylesheet" type="text/css" media="all" />
+
+
+<!--[if IE 6]><link href="default_ie6.css" rel="stylesheet" type="text/css" /><![endif]-->
+
+</head>
+<body>
+<div id="page" class="container">
+	<div id="header">
+		<div id="logo">
+			<h3><a href="#">Text Pipeliner</a></h3>
+			<span>by <a href="https://github.com/CharlesDLandau" rel="nofollow">Charles Landau</a></span>
+		</div>
+		<div id="menu">
+			<ul>
+				<li><a href="/" accesskey="1" title="">Home</a></li>
+				<li><a href="/diy" accesskey="2" title="">DIY</a></li>
+				<li><a href="/api/docs" accesskey="3" title="">API</a></li>
+				<li><a href="/about" accesskey="4" title="">About</a></li>
+			</ul>
+		</div>
+	</div>
+	<div id="main">
+		<div id="welcome">
+			<div class="title">
+				<h1><b>Text Pipeliner</b></h1>
+				<span class="byline">Classifying News Articles and Showing How</span>
+			</div>
+		{% if url_for(request.endpoint) == '/' %} 
+			<p>
+				This is <strong>Text Pipeliner</strong>, a tool for classifying news articles with SKLearn pipelines. In the demo below, you can see what happens when you analyze an article with Text Pipeliner. If you want to try it for yourself, head over to the DIY section, pick a pipeline, and paste an article into the text box. Text Pipeliner also serves applications with a RESTful API.
+			</p>
+			<p>
+				Text Pipeliner was written by Charles Landau, you can learn more about the project in the About section.
+			</p>
+		{% endif %}
+		</div>
+	
+		
+        <div id="featured">
+	        {% block content %}
+	        {% if diy_ttr_value is defined %}
+	        	{% include 'response_render_usrtext.html' %}
+	        {% elif '/diy' == url_for(request.endpoint) %}
+	        	{% include 'diy.html' %}
+	        {% elif url_for(request.endpoint) == '/' %}
+	        	{% include 'demo.html' %}
+	        {% elif url_for(request.endpoint) == "/api/docs" %}
+	        	{% include 'apidocs.html' %}
+	        {% elif url_for(request.endpoint) == "/about" %}
+	        	{% include 'about.html' %}
+	        {% else %}
+	        	<p> Uh oh! Something went wrong... </p> <!-- TODO: Handle... -->
+			{% endif %}
+			{% endblock %}
+		</div>
+
+		<div id="copyright">
+			<span>&copy; Text Pipeliner. All rights reserved.</a></span>
+			<span>Design by <a href="http://templated.co" rel="nofollow">TEMPLATED</a>.</span>
+		</div>
+	</div>
+</div>
+</body>
+</html>

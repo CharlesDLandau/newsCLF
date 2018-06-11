@@ -1,0 +1,29 @@
+<div id="formContent">
+<form action="/diy/submission" method="post">
+		<div>
+			<label for="pickle">Pipeline:</label>
+			<select name="pickles">
+				{% for pickle in pickles %}
+			    	<option value="{{ pickle }}">{{ pickle }}</option>
+			    {% endfor %}
+				
+				
+			</select>
+		</div>
+		<div>
+			<label for="article">Article:</label>
+			<textarea id="article" name="article_text"></textarea>
+		</div>
+		<div class="button">
+			<button type="submit" onclick="preloader()">Go!</button>
+		</div>
+</form>
+</div>
+<div id="formLoading"></div>
+
+<script type="text/javascript">
+        function preloader(){
+            document.getElementById("formContent").style.display = "none";
+            document.getElementById("formLoading").style.display = "block";
+        };
+</script>
