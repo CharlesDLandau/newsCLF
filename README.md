@@ -117,7 +117,7 @@ pickle_store = reg.load_pickles()
 When you're ready to create a container:
 
 ```
-docker build -t newsclf
+docker build -t newsclf .
 [...]
 docker run -p 80:80 -t newsclf
 ```
