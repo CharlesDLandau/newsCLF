@@ -44,6 +44,14 @@ Text Pipeliner demonstrates how a `pipeline` can be productionized, but don't ma
 # Start:
 Clone the repo.
 
+### Option 1: Try to use the thrifty tailor:
+`thrifty_tailor.py` can try to fit a cheap model and persist it for you, so you can skip straight to building with docker.
+
+1. Make a venv from requirements.txt
+2. From the project directory, `python thrifty_tailor.py` -- This can take awhile
+
+### Option 2: DIY
+
 An example of persisting the pipeline from the project directory:
 ```
 # Import pipeliner modules:
@@ -88,7 +96,11 @@ tp.set_search_params({
 }})
 
 # Tune and persist the pipeline
-# By convention, the pickles are placed in a folder /store
+# You may need to:
+# 1: Run this line in a __main__ protected block
+# 2: Create the /store folder as it is excluded in the .gitignore
+# 3: Or, run thrifty_tailor.py from a venv built out of requirements.txt
+# 4: (It tries to fit a cheap model)
 tp.run(persist_dir="./app/pipeliner/store/")
 ```
 
@@ -114,10 +126,10 @@ reg.new_entry(item, "pipeline")
 pickle_store = reg.load_pickles()
 ```
 
-When you're ready to create a container:
+## When you're ready to create a container:
 
 ```
-docker build -t newsclf
+docker build -t newsclf .
 [...]
 docker run -p 80:80 -t newsclf
 ```
