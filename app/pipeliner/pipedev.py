@@ -57,9 +57,7 @@ class TextPipliner:
 
         # Validate filepath before we do anything expensive
         if persist:
-            try:
-                assert os.path.isdir(persist_dir)
-            except AssertionError:
+            if not os.path.isdir(persist_dir):
                 raise NotADirectoryError(
                     "{} is not a valid directory!".format(persist_dir))
 
@@ -138,11 +136,9 @@ class TextPipliner:
 
         # Pickle has to exist...
         try:
-            assert os.path.isfile(self.path)
             self._pipeline = joblib.load(filename=self.path)
-        except AssertionError:
-            raise NotADirectoryError(
-                "{} is not a valid pickle!".format(self.path))
+        except Exception as e:
+            raise e
 
         # Express the entry as a dict
         entry = {

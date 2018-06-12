@@ -1,5 +1,4 @@
 # Manage the pickles
-from flask import Response
 import os
 import json
 from sklearn.externals import joblib
@@ -29,7 +28,7 @@ class PickleRegister:
             register = json.load(f)
 
         # The register is a JSON array.
-        if not type(register) == list:
+        if not isinstance(register, list):
             raise ValueError("Invalid register file.")
 
         self._pickletypes = set([j["pickletype"] for j in register])
@@ -50,7 +49,7 @@ class PickleRegister:
         # Finally assign the _register
         self._register = register
 
-    def new_entry(self, entry, pickletype, id=None):
+    def new_entry(self, entry, pickletype, ID=None):
         # Accepts a new JSON object and registers it
 
         # Is the entry arg a filepath or dict?
@@ -65,22 +64,22 @@ class PickleRegister:
                 "Expected filepath or dict, got {}.".format(entry_type))
 
         # If no id is passed, use the name.
-        if not id:
-            id = entry["name"]
+        if not ID:
+            ID = entry["name"]
 
         # Check if id already exists.
         for i in self._ids["all"]:
-            if i == id:
+            if i == ID:
                 raise ValueError(
                     "{} is already registered, did you"
-                    " mean to use update_entry()?".format(id))
+                    " mean to use update_entry()?".format(ID))
 
         # Affix the metadata
-        entry = {"id": id, "pickletype": pickletype, "payload": entry}
+        entry = {"id": ID, "pickletype": pickletype, "payload": entry}
 
         # Append to the members
         self._register.append(entry)
-        self._ids["all"].append(id)
+        self._ids["all"].append(ID)
         # In case a new pickletype
         if pickletype not in self._ids.keys():
             self._ids[pickletype] = []
@@ -122,23 +121,23 @@ class PickleRegister:
 
         return None
 
-    def delete_entry(self, id, raise_notfound=False):
+    def delete_entry(self, ID, raise_notfound=False):
         # Find and delete an entry.
 
         if raise_notfound:
             # Register is a list, so this should get discrete entries O(1)
             size = len(self._register)
         # Filter it out
-        register = [x for x in self._register if x["id"] != id]
+        register = [x for x in self._register if x["id"] != ID]
 
         # Panic condition, this should never happen since ids are unique
-        assert not size - 1 > len(register)
+        if size - 1 > len(register):
+            raise Exception(
+                "This operation corrupted the register"
+                "...exiting to preserve it")
 
-        if raise_notfound:
-            try:
-                assert size - 1 == len(register)
-            except AssertionError:
-                raise ValueError("""ID "{}" not found.""".format(id))
+        if raise_notfound and (size - 1) == len(register):
+            raise ValueError("""ID "{}" not found.""".format(ID))
 
         with open(self.path, 'w') as f:
             json.dump(self._register, f)
@@ -164,10 +163,9 @@ class PickleRegister:
 
         # Generate a dict of {id: loaded pickle, ...} pairs.
         pickle_map = {
-            id: joblib.load(
-                os.path.join(self.storepath, id)) for id in pickle_set
+            ID: joblib.load(
+                os.path.join(self.storepath, ID)) for ID in pickle_set
         }
 
         # Return the dict - pickles are loaded into memory and accessible.
         return pickle_map
-
