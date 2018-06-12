@@ -1,6 +1,8 @@
 # Text Pipeliner
 ## Classifying News Articles and Showing How
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6c9a8285ff1d466991b582f7253d4ed1)](https://www.codacy.com/app/CharlesDLandau/newsCLF?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=CharlesDLandau/newsCLF&amp;utm_campaign=Badge_Grade)
+
 This is Text Pipeliner, a tool for classifying news articles with SKLearn pipelines. Text Pipeliner supports a web interface that you can simply copy and paste into, and it also serves applications with a RESTful API.
 
 Text Pipeliner was written by Charles Landau.
