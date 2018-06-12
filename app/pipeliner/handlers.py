@@ -1,5 +1,5 @@
 # Map the class public interface to API
-from flask import Response, jsonify
+from flask import Response
 
 
 class APIHandler():
@@ -40,7 +40,7 @@ class GetRegister(Response):
     def __init__(self, response, **kwargs):
         kwargs['mimetype'] = 'application/json'
 
-        return super(GetRegister, self).__init__(response, **kwargs)
+        super(GetRegister, self).__init__(response, **kwargs)
 
 
 class GetPrediction(Response):
@@ -49,4 +49,4 @@ class GetPrediction(Response):
     def __init__(self, response, **kwargs):
         kwargs['mimetype'] = 'application/json'
 
-        return super(GetPrediction, self).__init__(response, **kwargs)
+        super(GetPrediction, self).__init__(response, **kwargs)

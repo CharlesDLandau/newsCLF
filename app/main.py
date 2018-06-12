@@ -89,7 +89,7 @@ def post_prediction():
     model = pickle_store[request.json["id"]]
     try:
         prediction = model.predict([request.json["text"]])[0]
-    except Exception as e:
+    except Exception:
         abort(400)
 
     # Form the response
