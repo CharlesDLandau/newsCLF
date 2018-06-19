@@ -17,9 +17,7 @@ class APIHandler():
 
         prediction = model.predict([form["article_text"]])[0]
 
-        for entry in self.register:
-            if entry["id"] == formID:
-                regObject = entry
+        regObject = self.register["register"][formID]
 
         description = regObject['payload']['description']
 

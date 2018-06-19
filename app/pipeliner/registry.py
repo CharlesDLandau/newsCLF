@@ -5,7 +5,7 @@ from sklearn.externals import joblib
 
 
 class PickleRegister:
-    """A JSON array. Accepts a relpath to the register.json file
+    """A JSON object. Accepts a relpath to the register.json file
     and to the pickles themselves.
     Supports pickletype so we can add new kinds of pickles later.
     The load_pickles method is used to load all the registered pickles
@@ -19,32 +19,50 @@ class PickleRegister:
         self.path = path
         self.storepath = storepath
 
-        # An empty JSON array.
+        # An empty JSON object.
         if new_register:
             with open(path, 'w') as w:
-                json.dump([], w)
+                json.dump({"register": {}}, w)
 
         with open(path, 'r') as f:
             register = json.load(f)
 
-        # The register is a JSON array.
-        if not isinstance(register, list):
+        # The register is a JSON object.
+        if not isinstance(register, dict):
             raise ValueError("Invalid register file.")
 
-        self._pickletypes = set([j["pickletype"] for j in register])
-        if len(self._pickletypes) == 1:
+        # For iterating through the register to generate values
+        itr_reg = register["register"].items()
+
+        # Safely assign _pickletypes
+        if new_register:
+            self._pickletypes = set()
+        else:
+            self._pickletypes = set(
+                [j["pickletype"] for k, j in itr_reg])
+
+        # If empty...
+        if len(self._pickletypes) == 0:
+            self._ids = {"all": []}
+
+        # If just one registered...
+        elif len(self._pickletypes) == 1:
             # Duplicative and dirty, but cheap. Keeps the interface clean.
             self._ids = {
-                "all": [i["id"] for i in register],
+                "all": [i for i, n in itr_reg],
                 list(self._pickletypes)[0]: [
-                    i["id"] for i in register]
+                    i for i, n in itr_reg]
             }
-        else:
-            self._ids = {"all": [i["id"] for i in register]}
+
+        # If longer...
+        elif len(self._pickletypes) > 1:
+            self._ids = {"all": [i for i, n in itr_reg]}
             # Searchable by pickletype
             for label in self._pickletypes:
                 self._ids[label] = [
-                    i["id"] for i in register if i["pickletype"] == label]
+                    register["register"
+                             ][i]["id"] for i, n in itr_reg if n[
+                        "pickletype"] == label]  # Bad linting?
 
         # Finally assign the _register
         self._register = register
@@ -78,13 +96,13 @@ class PickleRegister:
         entry = {"id": ID, "pickletype": pickletype, "payload": entry}
 
         # Append to the members
-        self._register.append(entry)
+        self._register["register"][ID] = entry
         self._ids["all"].append(ID)
         # In case a new pickletype
         if pickletype not in self._ids.keys():
             self._ids[pickletype] = []
             self._pickletypes.update([pickletype])
-        self._ids[pickletype].append(id)
+        self._ids[pickletype].append(ID)
 
         with open(self.path, 'w') as f:
             json.dump(self._register, f)
@@ -112,9 +130,9 @@ class PickleRegister:
                     entry["id"]))
 
         # Find and update the entry
-        for ent in self._register:
-            if ent["id"] == entry["id"]:
-                ent = entry
+        for ent in self._register["register"].keys():
+            if ent == entry["id"]:
+                self._register["register"][ent] = entry
 
         with open(self.path, 'w') as f:
             json.dump(self._register, f)
@@ -126,12 +144,20 @@ class PickleRegister:
 
         if raise_notfound:
             # Register is a list, so this should get discrete entries O(1)
-            size = len(self._register)
+            size = len(self._register["register"])
         # Filter it out
-        register = [x for x in self._register if x["id"] != ID]
+        self._ids["all"] = [x for x in self._ids["all"] if x != ID]
+        t = self._register["register"][ID]["pickletype"]
+        self._ids[t] = [x for x in self._ids[t] if x != ID]
+        if len(self._ids[t]) == 0:
+            del self._ids[t]
+            self._pickletypes = set([x for x in self._pickletypes if x != t])
+        self._register = {"register": {
+            x: y for x, y in self._register["register"].items() if x != ID}
+        }
 
         # Panic condition, this should never happen since ids are unique
-        if size - 1 > len(register):
+        if raise_notfound and size - 1 > len(register):
             raise Exception(
                 "This operation corrupted the register"
                 "...exiting to preserve it")
@@ -159,7 +185,7 @@ class PickleRegister:
             # Accept the user input
             pickle_set = id_subset
         else:
-            pickle_set = [i["id"] for i in self._register]
+            pickle_set = [i for i, k in self._register["register"].items()]
 
         # Generate a dict of {id: loaded pickle, ...} pairs.
         pickle_map = {

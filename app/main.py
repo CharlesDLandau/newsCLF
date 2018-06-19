@@ -61,17 +61,16 @@ def get_register():
 
     # Handle with no id param
     if not request.args.get("id"):
-        resp = json.dumps({"register": ap.register})
+        resp = json.dumps(ap.register)
 
     else:
         # Bad request
         if request.args.get("id") not in reg._ids["all"]:
             abort(400)
         # Handle with valid id
-        for entry in ap.register:
-            if entry["id"] == request.args.get("id"):
-                resp = json.dumps({"register": entry})
-    return hd.GetRegister(resp), 201
+        entry = ap.register["register"][request.args.get("id")]
+        resp = {"register": entry}
+    return hd.GetRegister(json.dumps(resp)), 201
 
 
 @app.route('/api/predict', methods=['POST'])
@@ -94,11 +93,10 @@ def post_prediction():
 
     # Form the response
     resp = {}
-    for entry in ap.register:
-        if entry["id"] == request.json["id"]:
-            prediction = entry["payload"]["answer_key"][str(prediction)]
-            resp["prediction"] = prediction
-            resp["register"] = entry
+    entry = ap.register["register"][request.json["id"]]
+    prediction = entry["payload"]["answer_key"][str(prediction)]
+    resp["prediction"] = prediction
+    resp["register"] = entry
 
     return hd.GetPrediction(json.dumps(resp)), 201
 
