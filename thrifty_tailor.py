@@ -43,7 +43,7 @@ if __name__ == '__main__':
             #'tfidf__use_idf': (True, False),
             'tfidf__norm': ('l1', 'l2'),
             'clf__alpha': (0.00001, 0.000001),
-            'clf__penalty': ('l2', 'elasticnet'),
+            #'clf__penalty': ('l2', 'elasticnet'),
             #'clf__n_iter': (10, 50, 80),
         }})
 
