@@ -1,0 +1,2 @@
+# In Rewrite
+I'm rebuilding the Text Pipeliner with socketio, aiohttp, Keras, and using JSON instead of pickles. If you'd like to see the previous iteration in the meantime, visit [the oldNewsCLF branch](https://github.com/CharlesDLandau/newsCLF/tree/oldNewsCLF)
